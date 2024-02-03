@@ -6,13 +6,54 @@
 
 #4)
 
-def fibonacci(n,meno={}):
+import timeit
+
+import matplotlib.pyplot as plt
+def fibonacci(n):
+    if n==0 or n==1:
+        return n
+    else:
+        return fibonacci(n-1) +fibonacci(n-2)
+    
+
+
+time_taken_original = []
+time_taken_memo = []
+
+
+def fibonaciNew(n,meno={}):
     if n in meno:
         return meno[n]
     if n<=1:
         return n
-    meno[n] = fibonacci(n-1,meno) + fibonacci(n-2,meno)
+    meno[n] = fibonaciNew(n-1,meno) + fibonaciNew(n-2,meno)
     return meno[n]
 
-answer=fibonacci(15)
-print(answer)
+for i in range(0,35):
+    fibonacci(i)
+    time_taken= timeit.timeit(lambda:fibonacci(i),number=100)
+    time_taken_original.append(time_taken)
+    fibonaciNew(i)
+    time_taken_new = timeit.timeit(lambda:fibonaciNew(i,meno={}), number=100)
+    time_taken_memo.append(time_taken_new)
+plt.figure(figsize=(10,6))
+plt.plot(time_taken_original,label="original", marker="o")
+plt.title('Fibonacci Computation Time Comparison')
+plt.xlabel('n-th Fibonacci Number')
+plt.ylabel('Time (seconds)')
+plt.show()
+plt.figure(figsize=(10,6))
+plt.plot(time_taken_memo,label="Optimizedf", marker="x")
+plt.title('Fibonacci Computation Time Comparison')
+plt.xlabel('n-th Fibonacci Number')
+plt.ylabel('Time (seconds)')
+plt.show()
+
+
+
+
+#5  The new time comp[lexityy after using memoization is O(n) because each value is only computed once.
+
+#6
+
+
