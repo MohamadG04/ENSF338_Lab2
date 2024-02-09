@@ -29,10 +29,14 @@ def measure_performance(search_function, vector_size):
 
     for _ in range(1000):
         target = np.random.randint(0, vector_size)
-        time_taken = timeit.timeit(lambda: search_function(vector, target), number=100)
-        times.append(time_taken)
+        start_time = timeit.default_timer()
+        search_function(vector, target)
+        end_time = timeit.default_timer()
+        times.append(end_time - start_time)
 
     return np.mean(times)
+
+
 
 vector_sizes = [1000, 2000, 4000, 8000, 16000, 32000]
 linear_search_times = []
@@ -49,17 +53,26 @@ plt.plot(vector_sizes, linear_search_times, label='Linear Search', marker='o')
 plt.plot(vector_sizes, binary_search_times, label='Binary Search', marker='o')
 
 # Interpolate with quadratic functions
-def quadratic_func(x, a, b, c):
-    return a * x**2 + b * x + c
+def log_func(x, a, b):
+    return a * np.log(x) + b
 
-params_linear, _ = curve_fit(lambda x, a, b: a * x + b, vector_sizes, linear_search_times)
-params_binary, _ = curve_fit(quadratic_func, vector_sizes, binary_search_times)
+# Fit binary search data with logarithmic function
+params_binary_log, _ = curve_fit(log_func, vector_sizes, binary_search_times)
 
-plt.plot(vector_sizes, params_linear[0] * np.array(vector_sizes) + params_linear[1], linestyle='--', label='Linear Fit (Linear Search)')
-plt.plot(vector_sizes, quadratic_func(np.array(vector_sizes), *params_binary), linestyle='--', label='Quadratic Fit (Binary Search)')
+# Plot logarithmic fit for binary search
+plt.plot(vector_sizes, log_func(np.array(vector_sizes), *params_binary_log), linestyle='--', label='Logarithmic Fit (Binary Search)')
+
+
 
 plt.xlabel('Vector Size')
 plt.ylabel('Average Time (s)')
 plt.title('Performance of Linear and Binary Search')
 plt.legend()
 plt.show()
+
+
+# Answer to question 4:
+#The linear fit for linear search should closely match the data points, 
+#indicating that the time taken increases linearly with the vector size.
+# Logarithmic fit allows to appropiately represent binary search since it has a logarithmic time complexity (O(log n)) 
+# The results align closesly with the expectations we have of their repsective time complexities 
